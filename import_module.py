@@ -1,0 +1,184 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 29 15:45:04 2024
+
+@author: dafda1
+
+TODO: document (at least main function)
+TODO: improve x-axis conversion criteria testing
+"""
+
+import pandas as pd
+import numpy as np
+
+from xmltodict import parse
+
+def xrdml_into_dict (filename, mainkey_name = "xrdMeasurements"):
+    with open(filename, "rb") as fp:
+        xrdml_dict = parse(fp)
+    fp.close()
+    
+    return xrdml_dict[mainkey_name]
+
+def check_if_measurement_completed (xrdml_dict):
+    if "@status" in xrdml_dict.keys():
+        if xrdml_dict["@status"] == "Completed":
+            return True
+        else:
+            return False
+    else:
+        raise ValueError("'@status' key not found in dictionary provided")
+        return False
+
+def check_for_monochromator (wavelength_dict, tolerance = 1e-6):
+    key_list = []
+    for key in wavelength_dict.keys():
+        if "ratio" in key:
+            key_list.append(key)
+    
+    if len(key_list):
+        checked = True
+        for key in key_list:
+            if float(wavelength_dict[key]) > tolerance:
+                raise ValueError("Beam not monochromated")
+                checked = False
+                break
+        
+        return checked
+    
+    else:
+        raise ValueError("No information found on monochromation")
+        return False
+
+def wavelength_translator (wavelength_descriptor):
+    "WIP"
+    
+    if " " in wavelength_descriptor:
+        name, num = wavelength_descriptor.split(" ")
+    else:
+        name = wavelength_descriptor
+        num = None
+    
+    pre, post = name.split("-")
+    
+    newdesc = pre.lower() + post
+    if num is not None:
+        newdesc += num
+    
+    return newdesc
+
+def extract_intended_wavelength (wavelength_dict):
+    key = wavelength_translator(wavelength_dict["@intended"])
+    value_dict = wavelength_dict[key]
+    
+    wavelength_value = float(value_dict["#text"])
+    wavelength_units = value_dict["@unit"]
+    
+    return wavelength_value, wavelength_units
+
+def extract_intensities (dataPoints_dict):
+    intensities_dict = dataPoints_dict["intensities"]
+    
+    intensities_values = np.array(intensities_dict["#text"].split(),
+                                  dtype = float)
+    intensities_units = intensities_dict["@unit"]
+    
+    return intensities_values, intensities_units
+
+def extract_positions (dataPoints_dict, Npoints):
+    positions_dict = dataPoints_dict["positions"]
+    
+    axis = positions_dict["@axis"]
+    units = positions_dict["@unit"]
+    
+    start = float(positions_dict["startPosition"])
+    end = float(positions_dict["endPosition"])
+    
+    values = np.linspace(start, end, num = Npoints)
+    
+    return values, units, axis
+
+def import_xrdml_data (filename, convert_xaxis = True,
+                       include_metadata = False):
+    
+    #read file into dictionary
+    xrdml_dict = xrdml_into_dict(filename)
+    
+    #check if measurement is complete
+    if not check_if_measurement_completed(xrdml_dict):
+        raise ValueError("Measurement not completed, no data imported")
+        return None
+    
+    #define metadata dictionary
+    meta = {}
+    meta["preamble"] = xrdml_dict["comment"]["entry"]
+    
+    #extract dictionary for actual measurement
+    meas_dict = xrdml_dict["xrdMeasurement"]
+    
+    #append beam path info to metadata dictionary
+    for path in ("diffracted", "incident"):
+        meta[f"{path}BeamPath"] = meas_dict[f"{path}BeamPath"]
+    
+    #extract wavelength information and append to metadata dictionary
+    wavelength_dict = meas_dict["usedWavelength"]
+    meta["usedWavelength"] = wavelength_dict
+    
+    #extract scan information and append info to metadata dictionary
+    scan_dict = meas_dict["scan"]
+    meta["header"] = scan_dict["header"]
+    meta["nonAmbientPoints"] = scan_dict["nonAmbientPoints"]
+    
+    #extract dataPoints information (finally)
+    dataPoints_dict = meas_dict["scan"]["dataPoints"]
+    
+    intensities_values, intensities_units =\
+        extract_intensities(dataPoints_dict)
+    positions_values, positions_units, positions_name =\
+        extract_positions(dataPoints_dict, Npoints = intensities_values.size)
+        
+    #initialise dataframe and populate with data obtained
+    df = pd.DataFrame(dtype = float)
+    
+    df[f"{positions_name} ({positions_units})"] = positions_values
+    df[f"Intensity ({intensities_units})"] = intensities_values
+    
+    #if intensity is in counts, estimate error with sqrt (Poisson distr.)
+    if intensities_units == "counts":
+        df["Intensity ESD (counts)"] = np.sqrt(intensities_values)
+    
+    #convert 2Theta to other quantities if requested
+    if convert_xaxis:
+        if positions_name in ("2Theta", "2theta") and\
+            check_for_monochromator(wavelength_dict):
+            
+            if positions_units == "deg":
+                df[f"{positions_name} (rad)"] =\
+                    df[f"{positions_name} (deg)"]*np.pi/180
+            
+            elif positions_units != "rad":
+                raise ValueError("Could not convert x-axis:"+\
+                                 f" {positions_units} not recognized")
+            
+            if f"{positions_name} (rad)" in df.columns:
+                #convert to dspacing
+                wavelength_value, wavelength_units =\
+                    extract_intended_wavelength(wavelength_dict)
+                
+                df[f"d-spacing ({wavelength_units})"] =\
+                    wavelength_value*1.0/(2*np.sin(0.5*df[f"{positions_name} (rad)"]))
+                
+                #convert to momentum transfer
+                df[f"Q (inv {wavelength_units})"] =\
+                    2*np.pi/df[f"d-spacing ({wavelength_units})"]
+                
+            else:
+                ValueError("Could not convert x-axis: conditions not met")
+            
+        else:
+            raise ValueError("Could not convert x-axis: conditions not met")
+    
+    if include_metadata:
+        return df, meta
+    else:
+        return df
