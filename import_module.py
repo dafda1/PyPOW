@@ -100,6 +100,47 @@ def extract_positions (dataPoints_dict, Npoints):
 
 def import_xrdml_data (filename, convert_xaxis = True,
                        include_metadata = False):
+    """
+    Tool for importing powder diffraction data from an XRDML file
+    to a Pandas DataFrame.
+
+    Parameters
+    ----------
+    filename : str
+        Location of XRDML file, include extension.
+    convert_xaxis : bool, optional
+        Choice of whether to write down values of 2theta as the equivalent
+        d-spacing and momentum transfer values. Only works if position
+        argument is recognized as 2theta, if there is enough information
+        about the wavelength used, and if the radiation is monochromatic
+        (otherwise the d-spacing and Q values have no physical meaning).
+        The default is True.
+    include_metadata : bool, optional
+        Choice of whether to import metadata as well. See meta output for
+        more info. The default is False.
+
+    Raises
+    ------
+    ValueError
+        If a mistake is found with the input, or if there is not enough
+        information to execute the choices detailed.
+
+    Returns
+    -------
+    df : DataFrame
+        Powder diffraction data information in DataFrame format.
+        Will typically have the following columns: '2Theta (deg)',
+        'Intensity (counts)', 'Intensity ESD (counts)', '2Theta (rad)',
+        'd-spacing (Angstrom)', 'Q (inv Angstrom)'. Columns and units
+        can change depending on information present in the XRDML file, e.g.
+        'Intensity ESD (counts)' column is only calculated if the units
+        of Intensity are counts, and not cps; and d-spacing and momentum
+        transfer info is only calculated if radiation is monochromated.
+    meta : dict (if requested)
+        Dictionary containing metadata of XRD measurement taken. Typically
+        has the direct same format as in the XRDML file.
+
+    """
     
     #read file into dictionary
     xrdml_dict = xrdml_into_dict(filename)
