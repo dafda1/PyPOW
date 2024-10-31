@@ -4,7 +4,6 @@ Created on Tue Oct 29 15:45:04 2024
 
 @author: dafda1
 
-TODO: document (at least main function)
 TODO: improve x-axis conversion criteria testing
 """
 
