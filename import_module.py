@@ -5,6 +5,8 @@ Created on Tue Oct 29 15:45:04 2024
 @author: dafda1
 
 TODO: improve x-axis conversion criteria testing
+TODO: currently does not work for .xrdml files while being generated,
+only for _1.XRDML corrected files. need to make it compatible with both
 """
 
 import pandas as pd
@@ -86,7 +88,7 @@ def extract_intensities (dataPoints_dict):
 
 def extract_positions (dataPoints_dict, Npoints):
     positions_dict = dataPoints_dict["positions"]
-    
+        
     axis = positions_dict["@axis"]
     units = positions_dict["@unit"]
     
