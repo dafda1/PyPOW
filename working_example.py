@@ -55,3 +55,5 @@ data[:, 1] = df["Intensity (counts)"]
 np.savetxt("ASG_1_edited.xy", data, fmt = ("%.3f", "%.1f"),
            header = "lambda = %.5f %s\n" % get_wvl(meta['usedWavelength']) +\
                     "2theta (deg), Intensity (counts)")
+                    
+plt.show()
