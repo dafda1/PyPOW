@@ -13,9 +13,6 @@ from PyPOW.import_module import extract_intended_wavelength as get_wvl
 
 from sys import argv
 
-from os.path import join, dirname
-from os import mkdir
-
 #%% check input and get list of files
 
 if len(argv) < 2:
