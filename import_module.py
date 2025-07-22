@@ -42,6 +42,27 @@ def xrdml_into_dict (filename, mainkey_name = "xrdMeasurements"):
     return xrdml_dict[mainkey_name]
 
 def check_if_measurement_completed (xrdml_dict):
+    """
+    Check if measurement completed in metadata.
+
+    Parameters
+    ----------
+    xrdml_dict : dict
+        Dictionary with measurement results.
+
+    Raises
+    ------
+    ValueError
+        If '@status' key not found in dictionary provided. The value
+        corresponding to this key contains information on whether
+        measurement is complete.
+
+    Returns
+    -------
+    bool
+        True if xrdml_dict['@status'] == 'Completed', False otherwise.
+    """
+    
     if "@status" in xrdml_dict.keys():
         if xrdml_dict["@status"] == "Completed":
             return True
