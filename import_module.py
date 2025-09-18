@@ -73,6 +73,27 @@ def check_if_measurement_completed (xrdml_dict):
         return False
 
 def check_for_monochromator (wavelength_dict, tolerance = 1e-6):
+    """
+    Check if radiation is monochromated by reading the 
+
+    Parameters
+    ----------
+    wavelength_dict : TYPE
+        DESCRIPTION.
+    tolerance : TYPE, optional
+        DESCRIPTION. The default is 1e-6.
+
+    Raises
+    ------
+    ValueError
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     key_list = []
     for key in wavelength_dict.keys():
         if "ratio" in key:
@@ -89,7 +110,7 @@ def check_for_monochromator (wavelength_dict, tolerance = 1e-6):
         return checked
     
     else:
-        raise ValueError("No information found on monochromation")
+        raise ValueError("No information found on monochromation.")
         return False
 
 def wavelength_translator (wavelength_descriptor):
@@ -181,7 +202,7 @@ def import_xrdml_data (filename, convert_xaxis = True,
     meta : dict (if requested)
         Dictionary containing metadata of XRD measurement taken. Typically
         has the direct same format as in the XRDML file.
-
+        
     """
     
     #read file into dictionary
