@@ -3,8 +3,8 @@ requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "PyPOW"
-version = "0.0.1"
+name = "PyPowder"
+version = "0.0.4"
 authors = [
   { name="Diogo Almeida", email="dafda1@st-andrews.ac.uk" },
 ]
