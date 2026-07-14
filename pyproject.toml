@@ -26,8 +26,8 @@ license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Homepage = "https://github.com/MaxPelly/PyPOW"
-Issues = "https://github.com/MaxPelly/PyPOW/issues"
+Homepage = "https://github.com/dafda1/PyPOW"
+Issues = "https://github.com/dafda1/PyPOW/issues"
 
 [tool.setuptools_scm]
 version_file = "src/PyPOW/__version__.py"
