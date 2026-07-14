@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PyPowder"
+version = "0.0.4"
+authors = [
+  { name="Diogo Almeida", email="dafda1@st-andrews.ac.uk" },
+]
+description = "Attempt at constructing a set of tools to convert XRDML files to a more usable format."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+	"pandas",
+	"numpy",
+	"xmltodict",
+	"matplotlib",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/dafda1/PyPOW"
+Issues = "https://github.com/dafda1/PyPOW/issues"
