@@ -9,7 +9,6 @@ authors = [
   { name="Diogo Almeida"},
   { name="Max Pelly"},
 ]
-
 maintainers = [
 	{ name="Diogo Almeida", email="dafda1@st-andrews.ac.uk" }
 ]
