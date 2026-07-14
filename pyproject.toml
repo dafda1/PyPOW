@@ -29,5 +29,8 @@ license-files = ["LICEN[CS]E*"]
 Homepage = "https://github.com/MaxPelly/PyPOW"
 Issues = "https://github.com/MaxPelly/PyPOW/issues"
 
+[project.scripts]
+PyPOW = "PyPOW.__main__:convert_files"
+
 [tool.setuptools_scm]
 version_file = "src/PyPOW/__version__.py"
