@@ -11,7 +11,7 @@ import numpy as np
 from PyPOW.import_module import import_xrdml_data
 from PyPOW.import_module import extract_intended_wavelength as get_wvl
 
-from sys import argv
+import sys
 
 #%% define conversion functions
 
@@ -39,10 +39,10 @@ def convert_file (filename):
 #%% run conversions
 def convert_files():
 
-    if len(argv) < 2:
+    if len(sys.argv) < 2:
         raise ValueError("Must specify filenames to convert.")
     else:
-        files_to_convert = argv[1:]
+        files_to_convert = sys.argv[1:]
 
     for filename in files_to_convert:
         print(f">> Converting file {filename}.")
