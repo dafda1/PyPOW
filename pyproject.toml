@@ -5,9 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "PyPowder"
 dynamic = ["version"]
-authors = [
+maintainers = [
   { name="Diogo Almeida", email="dafda1@st-andrews.ac.uk" },
-  { name="Max Pelly", email="mp250@st-andrews.ac.uk" },
+]
+authors = [
+  { name="Diogo Almeida" },
+  { name="Max Pelly" },
 ]
 description = "Attempt at constructing a set of tools to convert XRDML files to a more usable format."
 readme = "README.md"
