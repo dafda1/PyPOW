@@ -2,10 +2,7 @@ import pytest
 import numpy as np
 import pandas as pd
 import pandas.testing as pdt
-from unittest.mock import mock_open, patch
-
-# Assuming the provided script is saved as xrdml_parser.py
-from PyPOW import import_module as xp
+import PyPOW
 
 # --- Fixtures for Mock Data ---
 
@@ -34,68 +31,67 @@ def valid_dataPoints_dict():
 def test_check_if_measurement_completed():
     """Tests the validation of the measurement @status key."""
     # Pass condition
-    assert xp.check_if_measurement_completed({"@status": "Completed"}) is True
+    assert PyPOW.check_if_measurement_completed({"@status": "Completed"}) is True
     
     # Fail condition (InProgress)
-    assert xp.check_if_measurement_completed({"@status": "InProgress"}) is False
+    assert PyPOW.check_if_measurement_completed({"@status": "InProgress"}) is False
     
     # Fail condition (Missing key raises ValueError)
     with pytest.raises(ValueError, match="'@status' key not found"):
-        xp.check_if_measurement_completed({"other_key": "Completed"})
+        PyPOW.check_if_measurement_completed({"other_key": "Completed"})
 
 def test_check_for_monochromator(valid_wavelength_dict):
     """Tests if radiation is correctly identified as monochromated."""
     # Pass condition: ratio is exactly 0.0 (below tolerance)
-    assert xp.check_for_monochromator(valid_wavelength_dict) is True
+    assert PyPOW.check_for_monochromator(valid_wavelength_dict) is True
     
     # Fail condition: ratio exceeds 1e-6
     invalid_dict = valid_wavelength_dict.copy()
     invalid_dict["ratioKAlpha2KAlpha1"] = "0.5"
     with pytest.raises(ValueError, match="Beam not monochromated"):
-        xp.check_for_monochromator(invalid_dict)
+        PyPOW.check_for_monochromator(invalid_dict)
         
     # Fail condition: no ratio key found
     missing_ratio_dict = {"@intended": "K-Alpha 1"}
     with pytest.raises(ValueError, match="No information found on monochromation."):
-        xp.check_for_monochromator(missing_ratio_dict)
+        PyPOW.check_for_monochromator(missing_ratio_dict)
 
 def test_wavelength_translator():
     """Tests the translation of wavelength descriptors to dictionary keys."""
-    assert xp.wavelength_translator("K-Alpha 1") == "kAlpha1"
-    assert xp.wavelength_translator("K-Alpha") == "kAlpha"
-    assert xp.wavelength_translator("K-Beta 2") == "kBeta2"
+    assert PyPOW.wavelength_translator("K-Alpha 1") == "kAlpha1"
+    assert PyPOW.wavelength_translator("K-Alpha") == "kAlpha"
+    assert PyPOW.wavelength_translator("K-Beta 2") == "kBeta2"
 
 def test_extract_intended_wavelength(valid_wavelength_dict):
     """Tests the extraction of the numerical wavelength and its units."""
-    value, units = xp.extract_intended_wavelength(valid_wavelength_dict)
+    value, units = PyPOW.extract_intended_wavelength(valid_wavelength_dict)
     assert value == 1.540598
     assert units == "Angstrom"
 
 def test_extract_intensities(valid_dataPoints_dict):
     """Tests string to float array conversion for intensities."""
-    values, units = xp.extract_intensities(valid_dataPoints_dict)
+    values, units = PyPOW.extract_intensities(valid_dataPoints_dict)
     np.testing.assert_array_equal(values, np.array([100., 150., 200.]))
     assert units == "counts"
 
 def test_extract_positions(valid_dataPoints_dict):
     """Tests linear space generation for positional data based on start/end points."""
-    values, units, axis = xp.extract_positions(valid_dataPoints_dict, Npoints=3)
+    values, units, axis = PyPOW.extract_positions(valid_dataPoints_dict, Npoints=3)
     np.testing.assert_array_equal(values, np.array([10.0, 20.0, 30.0]))
     assert units == "deg"
     assert axis == "2Theta"
 
 # --- Integration / File Tests ---
 
-def test_import_xrdml_data_dummy_path():
+def test_import_xrdml_data():
     """
-    Integration test utilizing a dummy file path. 
-    UPDATE 'dummy_path_to_your_file.xrdml' TO YOUR ACTUAL FILE PATH.
+    Integration test utilizing a dummy file path.
     """
     dummy_filepath = "tests/ASG1_1.XRDML"
     
     try:
         # Attempt to run the import tool; include_metadata is explicitly set to test both outputs
-        df, meta = xp.import_xrdml_data(dummy_filepath, convert_xaxis=True, include_metadata=True)
+        df, meta = PyPOW.import_xrdml_data(dummy_filepath, convert_xaxis=True, include_metadata=True)
         
         # Basic validation of the outputs
         assert isinstance(df, pd.DataFrame)
@@ -115,21 +111,12 @@ def test_dataframe_matches_csv():
     Integration test to verify that the DataFrame imported from an XRDML file
     matches a known-good CSV output.
     """
-    # Replace these dummy paths with your actual file paths
     xrdml_filepath = "tests/ASG1_1.XRDML"
     csv_filepath = "tests/ASG1_1.csv"
 
     try:
-        # Import data from XRDML
-        # Ensure convert_xaxis matches how the CSV was originally generated
-        df_xrdml = xp.import_xrdml_data(xrdml_filepath, convert_xaxis=True, include_metadata=False)
-        
-        # Read the expected data from the CSV
+        df_xrdml = PyPOW.import_xrdml_data(xrdml_filepath, convert_xaxis=True, include_metadata=False)
         df_csv = pd.read_csv(csv_filepath, index_col=0)
-        
-        # Compare the two DataFrames
-        # check_exact=False allows for minor floating-point differences
-        # that naturally occur when saving/loading decimal values to/from CSV.
         pdt.assert_frame_equal(df_xrdml, df_csv, check_exact=False)
         
     except FileNotFoundError as e:
