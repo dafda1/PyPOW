@@ -157,7 +157,7 @@ def extract_positions (dataPoints_dict, Npoints):
         else:
             raise ValueError("No 2Theta data")
         positions_dict = positions_dict_item
-    elif type(positions_list) == dict:
+    elif type(positions_dict) == dict:
         pass
     else:
         raise ValueError("positions_dict not as expected")
