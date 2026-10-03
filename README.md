@@ -5,4 +5,4 @@
 
 ## Contributions
 Thanks to Max Pelly for
-- restructuring files for deployment (ongoing with conda-forge)
+- restructuring files for deployment with PyPI and conda-forge
