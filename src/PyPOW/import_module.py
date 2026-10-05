@@ -150,6 +150,18 @@ def extract_intensities (dataPoints_dict):
 
 def extract_positions (dataPoints_dict, Npoints):
     positions_dict = dataPoints_dict["positions"]
+    if type(positions_dict) == list:
+        for positions_dict_item in positions_dict:
+            if positions_dict_item["@axis"] == "2Theta":
+                break
+        else:
+            raise ValueError("No 2Theta data")
+        positions_dict = positions_dict_item
+    elif type(positions_dict) == dict:
+        pass
+    else:
+        raise ValueError("positions_dict not as expected")
+        
         
     axis = positions_dict["@axis"]
     units = positions_dict["@unit"]
@@ -231,7 +243,8 @@ def import_xrdml_data (filename, convert_xaxis = True,
     #extract scan information and append info to metadata dictionary
     scan_dict = meas_dict["scan"]
     meta["header"] = scan_dict["header"]
-    meta["nonAmbientPoints"] = scan_dict["nonAmbientPoints"]
+    if "nonAmbientPoints" in scan_dict.keys():
+        meta["nonAmbientPoints"] = scan_dict["nonAmbientPoints"]
     
     #extract dataPoints information (finally)
     dataPoints_dict = meas_dict["scan"]["dataPoints"]
