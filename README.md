@@ -8,6 +8,14 @@
  to read `*.xrdml` files as generated.~~ `*.xrdml` files now readable, changes added by
  Max Pelly.
 
+## Command line instructions
+ To use the command line tool to convert to `.xy` format use the `PyPOW` command as
+ ```
+ >> PyPOW [XRDfile]_1.XRDML
+ ```
+This will create a `[XRDfile]_1.xy` two-column format file with 2theta (in degrees) and
+intensities (number of counts) in the directory from which it is run.
+
 ## Contributions
 Thanks to Max Pelly for
 - restructuring files for deployment with PyPI and conda-forge
