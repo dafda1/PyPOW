@@ -19,6 +19,9 @@
 This will create a `[XRDfile]_1.xy` two-column format file with 2theta (in degrees) and
 intensities (number of counts) in the directory from which it is run.
 
+## Import data to Python
+ See `working_example.py` script for a working example on how to use the `import_xrdml_data` function to import data directly from a file into a pandas DataFrame.
+
 ## Contributions
 Thanks to Max Pelly for
 - restructuring files for deployment with PyPI and conda-forge
