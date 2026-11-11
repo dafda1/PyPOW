@@ -8,6 +8,9 @@
  to read `*.xrdml` files as generated.~~ `*.xrdml` files now readable, changes added by
  Max Pelly.
 
+## Installation
+ The package is available through [PyPI](https://pypi.org/project/PyPowder/) and [conda-forge](https://anaconda.org/channels/conda-forge/packages/pypowder/overview) and listed as PyPowder.
+
 ## Command line instructions
  To use the command line tool to convert to `.xy` format use the `PyPOW` command as
  ```
